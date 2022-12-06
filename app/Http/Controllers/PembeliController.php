@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 class PembeliController extends Controller
 {
     public function index() {
-        $datas = DB::select('select * from pembeli');
+        $datas = DB::select('select * from pembeli where pbsoft_delete = 0');
 
         return view ('pembeli.index')
             ->with('datas', $datas);
@@ -69,5 +69,19 @@ class PembeliController extends Controller
         DB::delete('DELETE FROM pembeli WHERE id_pembeli = :id_pembeli', ['id_pembeli' => $id]);
 
         return redirect()->route('pembeli.index')->with('success', 'Data Pembeli berhasil dihapus');
+    }
+
+    public function soft($id)
+    {
+        DB::update('UPDATE pembeli SET pbsoft_delete = 1 WHERE id_pembeli = :id_pembeli', ['id_pembeli' => $id]);
+
+        return redirect()->route('pembeli.index')->with('success', 'Data Barang berhasil dihapus');
+    }
+
+    public function restore()
+    {
+        DB::update('UPDATE pembeli SET pbsoft_delete = 0 WHERE pbsoft_delete');
+
+        return redirect()->route('pembeli.index')->with('success', 'Data Barang berhasil direstore');
     }
 }

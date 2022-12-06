@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class PenjualController extends Controller
 {
     public function index() {
-        $datas = DB::select('select * from penjual');
+        $datas = DB::select('select * from penjual where pjsoft_delete = 0');
 
         return view ('penjual.index')
             ->with('datas', $datas);
@@ -68,5 +68,19 @@ class PenjualController extends Controller
         DB::delete('DELETE FROM penjual WHERE id_penjual = :id_penjual', ['id_penjual' => $id]);
 
         return redirect()->route('penjual.index')->with('success', 'Data Penjual berhasil dihapus');
+    }
+
+    public function soft($id)
+    {
+        DB::update('UPDATE penjual SET pjsoft_delete = 1 WHERE id_penjual = :id_penjual', ['id_penjual' => $id]);
+
+        return redirect()->route('penjual.index')->with('success', 'Data Barang berhasil dihapus');
+    }
+
+    public function restore()
+    {
+        DB::update('UPDATE penjual SET pjsoft_delete = 0 WHERE pjsoft_delete');
+
+        return redirect()->route('penjual.index')->with('success', 'Data Barang berhasil direstore');
     }
 }

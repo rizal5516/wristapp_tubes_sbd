@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
     public function index() {
-        $datas = DB::select('select * from product');
+        $datas = DB::select('select * from product where prsoft_delete = 0');
 
         return view ('product.index')
             ->with('datas', $datas);
@@ -21,7 +21,6 @@ class ProductController extends Controller
 
     public function store(Request $request) {
         $request->validate([
-            'id_jam' => 'required',
             'product_name' => 'required',
             'merk' => 'required',
             'harga' => 'required',
@@ -32,7 +31,6 @@ class ProductController extends Controller
 
         DB::insert('INSERT INTO product(id_jam, product_name, merk, harga, thn_rilis, stok, id_penjual) VALUES (null, :product_name, :merk, :harga, :thn_rilis, :stok, :id_penjual)',
         [
-            'id_jam' => $request->id_jam,
             'product_name' => $request->product_name,
             'merk' => $request->merk,
             'harga' => $request->harga,
@@ -82,5 +80,19 @@ class ProductController extends Controller
         DB::delete('DELETE FROM product WHERE id_jam = :id_jam', ['id_jam' => $id]);
 
         return redirect()->route('product.index')->with('success', 'Data Product berhasil dihapus');
+    }
+
+    public function soft($id)
+    {
+        DB::update('UPDATE product SET prsoft_delete = 1 WHERE id_jam = :id_jam', ['id_jam' => $id]);
+
+        return redirect()->route('product.index')->with('success', 'Data Barang berhasil dihapus');
+    }
+
+    public function restore()
+    {
+        DB::update('UPDATE product SET prsoft_delete = 0 WHERE prsoft_delete');
+
+        return redirect()->route('product.index')->with('success', 'Data Barang berhasil direstore');
     }
 }
